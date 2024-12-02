@@ -34,13 +34,25 @@ $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 $positionStart = (strpos($response, 'token') + 8);
 $token = substr($response, $positionStart, ((strpos($response, 'expires') - 3) - $positionStart));
 
-
 curl_close($ch);
+
+//grabs dates for api request
+$month = idate('m');
+echo "month: " . $month;
+$year = idate('y');
+echo "year: " . $year;
+$last = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+echo "last: " . $last;
 
 // Handle the response
 if ($httpCode == 200) {
     // if Bearer token successfully retreieved make api request to grab the four upcoming events
-    $eventUrl = getenv("API_URL") . 'event/query?limit=4';
+    if($month <= 9){
+        $eventUrl = getenv("API_URL") . 'event/query?startDate=01-0' . $month . '-20' . $year . "&endDate=". $last ."-" . $month . "-20" . $year;
+    }else{
+        $eventUrl = getenv("API_URL") . 'event/query?startDate=01-' . $month . '-20' . $year . "&endDate=". $last ."-" . $month . "-20" . $year;
+    }
+    echo "\n".$eventUrl;
     $headers2 = [
         'Authorization: ' . $token,
         'Cookie: PHPSESSID=67he5r63o0k1u6ctf9sc5mh13a',
@@ -76,7 +88,7 @@ if ($httpCode == 200) {
 
 
 
-        //v-- handles api response
+        //v-- styles api response
 
         //takes each of the individual arrays and splits it into key and value
         //[0] => data title
